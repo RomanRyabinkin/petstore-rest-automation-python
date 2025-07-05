@@ -1,0 +1,7 @@
+pytest
+requests
+pyyaml
+sqlalchemy
+psycopg2-binary
+jsonschema
+

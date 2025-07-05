@@ -2,16 +2,22 @@
 Модуль client: предоставляет класс ApiClient для взаимодействия с REST API Swagger Petstore,
 включая методы запросов и валидацию по JSON Schema.
 """
-
-
-
+import os
 from typing import Any, Dict, Optional
 
 import yaml, requests
 from jsonschema import validate
 
-with open('config.yaml') as f:
-    _config = yaml.safe_load(f)
+
+def _load_config() -> Dict[str, Any]:
+    """Загружает конфигурацию из файла config.yaml в корне проекта."""
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    config_path = os.path.join(base_dir, 'config.yaml')
+    with open(config_path, 'r', encoding='utf-8') as f:
+        return yaml.safe_load(f)
+
+
+_config = _load_config()
 
 
 class ApiClient:
@@ -28,6 +34,7 @@ class ApiClient:
         self.timeout = _config['api']['timeout']
 
     def _url(self, path: str): return f"{self.base}/{path.lstrip('/')}"
+
     """
     Формирование полного URL запароса. 
     Объединяет базовый URL и путь к эндпоинту запроса.
@@ -99,7 +106,6 @@ class ApiClient:
 
     @staticmethod
     def validate(response: requests.Response, schema_file: str):
-
         """
         Проверка валидации JSON-ответа запроса по JSON Schema.
 
@@ -111,8 +117,8 @@ class ApiClient:
             jsonschema.exceptions.ValidationError: при ошибке валидации.
         """
 
-        schema_path: str = f"src/schemas/{schema_file}"
-        with open(schema_path, 'r') as _f:
-            schema: Dict[str, Any] = yaml.safe_load(_f)
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        schema_path = os.path.join(base_dir, 'src', 'schemas', schema_file)
+        with open(schema_path, 'r', encoding='utf-8') as f:
+            schema: Dict[str, Any] = yaml.safe_load(f)
         validate(instance=response.json(), schema=schema)
-

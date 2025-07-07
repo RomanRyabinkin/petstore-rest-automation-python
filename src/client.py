@@ -3,21 +3,13 @@
 включая методы запросов и валидацию по JSON Schema.
 """
 import os
+from pathlib import Path
 from typing import Any, Dict, Optional
 
 import yaml, requests
 from jsonschema import validate
 
-
-def _load_config() -> Dict[str, Any]:
-    """Загружает конфигурацию из файла config.yaml в корне проекта."""
-    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    config_path = os.path.join(base_dir, 'config.yaml')
-    with open(config_path, 'r', encoding='utf-8') as f:
-        return yaml.safe_load(f)
-
-
-_config = _load_config()
+from config import config
 
 
 class ApiClient:
@@ -30,8 +22,8 @@ class ApiClient:
     """
 
     def __init__(self):
-        self.base = _config['api']['base_url'].rstrip('/')
-        self.timeout = _config['api']['timeout']
+        self.base = config['api']['base_url'].rstrip('/')
+        self.timeout = config['api']['timeout']
 
     def _url(self, path: str): return f"{self.base}/{path.lstrip('/')}"
 

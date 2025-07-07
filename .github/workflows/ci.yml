@@ -41,7 +41,7 @@ jobs:
 
       - name: Start Petstore API container
         run: |
-          docker run -d --name petstore -p 8080:8080 swaggerapipetstore3:unstable
+          docker run -d --name petstore -p 8080:8080 swaggerapi/petstore3:unstable
 
       - name: Wait for API
         run: |

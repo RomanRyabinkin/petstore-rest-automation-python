@@ -4,9 +4,10 @@ on:
   push:
     branches:
       - main
-    pull_request:
-      branches:
-        - main
+      - createCoreProject
+  pull_request:
+    branches:
+      - main
 
 jobs:
   test:
@@ -18,6 +19,8 @@ jobs:
           POSTGRES_USER: test
           POSTGRES_PASSWORD: test
           POSTGRES_DB: petstore
+        ports:
+          - 5432:5432
         options: >-
           --health-cmd "pg_isready -U test -d petstore"
           --health-interval 10s
@@ -37,9 +40,9 @@ jobs:
           . .venv/bin/activate
           pip install -r requirements.txt
 
-      - name: Start petstore API container
+      - name: Start Petstore API container
         run: |
-          docker run -d --name petstore -p 8080:8080 swaggerapi/petstore3:unstable
+          docker run -d --name petstore -p 8080:8080 swaggerapipetstore3:unstable
 
       - name: Wait for API
         run: |
@@ -57,10 +60,10 @@ jobs:
 
       - name: Run tests with coverage
         run: |
-                    . .venv/bin/activate
+          . .venv/bin/activate
           pytest --maxfail=1 --disable-warnings -q --cov=src --cov-report=xml
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
-          files: ./coverage.xml
+          files: coverage.xml

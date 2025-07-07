@@ -1,16 +1,15 @@
 import yaml
 from sqlalchemy import create_engine, MetaData, Table
+from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import sessionmaker
 
-with open("config.yaml") as f:
-    config = yaml.safe_load(f)
+from config import config
 
 db_url = config["db"]["url"]
 engine = create_engine(db_url)
 Session = sessionmaker(bind=engine)
 
 metadata = MetaData()
-pet_table = Table('pet', metadata, autoload_with=engine)
 
 
 def get_pet_by_id(pet_id: int):
@@ -25,6 +24,10 @@ def get_pet_by_id(pet_id: int):
         sqlalchemy.engine.Row | None: Объект Row с данными питомца или None, если запись не найдена.
     """
 
+    try:
+        pet_table = Table('pet', metadata, autoload_with=engine)
+    except OperationalError as e:
+        raise ConnectionError(f"Не удалось подключиться к БД: {e}")
     session = Session()
     try:
         return session.query(pet_table).filter_by(id=pet_id).first()

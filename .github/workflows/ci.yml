@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+    pull_request:
+      branches:
+        - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      db:
+        image: postgres:15
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: petstore
+        options: >-
+          --health-cmd "pg_isready -U test -d petstore"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m venv .venv
+          . .venv/bin/activate
+          pip install -r requirements.txt
+
+      - name: Start petstore API container
+        run: |
+          docker run -d --name petstore -p 8080:8080 swaggerapi/petstore3:unstable
+
+      - name: Wait for API
+        run: |
+          for i in {1..10}; do
+          
+            status=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/api/v3/pet/1) || true
+            echo "Attempt $i: status=$status"
+            if [[ "$status" != "502" ]]; then
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "API not ready" >&2
+          exit 1
+
+      - name: Run tests with coverage
+        run: |
+                    . .venv/bin/activate
+          pytest --maxfail=1 --disable-warnings -q --cov=src --cov-report=xml
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage.xml

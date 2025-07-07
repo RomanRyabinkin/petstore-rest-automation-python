@@ -60,6 +60,7 @@ jobs:
       - name: Run tests with coverage
         run: |
           . .venv/bin/activate
+          echo "PYTHONPATH=\"${{ github.workspace }}/src:$PYTHONPATH\"" >> $GITHUB_ENV
           pytest --maxfail=1 --disable-warnings -q --cov=src --cov-report=xml
 
       - name: Upload coverage to Codecov

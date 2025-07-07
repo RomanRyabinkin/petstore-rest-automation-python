@@ -1,6 +1,6 @@
 # Petstore REST Automation (Python)
 
-Автоматический фреймворк для тестирования Swagger Petstore REST API на Python с использованием `pytest`, `requests`, `SQLAlchemy` и `jsonschema`.
+Фреймворк для автоматизационного тестирования Swagger Petstore REST API на Python с использованием `pytest`, `requests`, `SQLAlchemy` и `jsonschema`.
 
 ## Содержание
 

@@ -1,58 +1,65 @@
 # Petstore REST Automation (Python)
 
-Фреймворк для автоматизационного тестирования Swagger Petstore REST API на Python с использованием:
+## 🇬🇧 English
 
-* `pytest` + `allure-pytest`
-* `requests`
-* `SQLAlchemy`
-* `jsonschema`
+A Python-based, extensible framework for automating tests against the Swagger Petstore REST API using:
 
-## Содержание
+- **pytest** + **allure-pytest**  
+- **requests**  
+- **SQLAlchemy**  
+- **jsonschema**
 
-* [Описание проекта](#описание-проекта)
-* [Требования](#требования)
-* [Установка](#установка)
-* [Конфигурация](#конфигурация)
-* [Структура проекта](#структура-проекта)
-* [Запуск тестов](#запуск-тестов)
-* [CI / GitHub Actions](#ci--github-actions)
-* [Отчётность](#отчётность)
-* [Расширение и поддержка](#расширение-и-поддержка)
+### Table of Contents
 
-## Описание проекта
+- [Project Description](#project-description)  
+- [Requirements](#requirements)  
+- [Installation](#installation)  
+- [Configuration](#configuration)  
+- [Project Structure](#project-structure)  
+- [Running Tests](#running-tests)  
+- [CI / GitHub Actions](#ci--github-actions)  
+- [Reporting](#reporting)  
+- [Extension & Maintenance](#extension--maintenance)  
 
-Проект демонстрирует построение расширяемого REST-фреймворка с:
+### Project Description
 
-* **HTTP-клиентом** (`src/client.py`): методы `get`, `post`, `put`, `delete`,
-  валидация JSON-ответов по JSON Schema (`src/schemas/*.json`).
-* **Доступом к БД** (`src/db.py`): SQLAlchemy, фикстуры для подготовки схемы и синхронизации данных.
-* **Динамическими тестовыми данными** (`tests/data.py`): фабрики `make_user()`, `make_order()`.
-* **Константами** (`tests/constants.py`): ключевые строки и префиксы ответов.
-* **Тестами** (`tests/`): позитивные и негативные сценарии для `/pet`, `/user`, `/store/order`.
-* **Allure** для удобного HTML-отчёта.
+This project demonstrates building an extensible REST-API test framework with:
 
-## Требования
+- **HTTP Client** (`src/client.py`):  
+  Methods `get`, `post`, `put`, `delete` and JSON Schema validation (`src/schemas/*.json`).  
+- **Database Access** (`src/db.py`):  
+  SQLAlchemy integration, fixtures for schema setup and data sync.  
+- **Dynamic Test Data** (`tests/data.py`):  
+  Factory functions `make_user()`, `make_order()`.  
+- **Constants** (`tests/constants.py`):  
+  Key response prefixes and strings.  
+- **Tests** (`tests/`):  
+  Positive and negative scenarios for `/pet`, `/user`, `/store/order`.  
+- **Allure** for rich HTML reporting.
 
-* Python 3.8+
-* Docker (Petstore API и Postgres)
-* Git
+### Requirements
 
-## Установка
+- Python 3.8+  
+- Docker (Petstore API & Postgres)  
+- Git  
+
+### Installation
 
 ```bash
 git clone https://github.com/RomanRyabinkin/petstore-rest-automation-python.git
 cd petstore-rest-automation-python
 python -m venv .venv
 source .venv/bin/activate      # Linux/macOS
-.\.venv\Scripts\Activate.ps1 # Windows PowerShell
+.\.venv\Scripts\Activate.ps1   # Windows PowerShell
 pip install -r requirements.txt
 ```
 
-> В `requirements.txt` добавлены: `pytest`, `pytest-cov`, `allure-pytest`, `requests`, `PyYAML`, `jsonschema`, `SQLAlchemy`, `psycopg2-binary`.
+> **requirements.txt** includes:  
+> `pytest`, `pytest-cov`, `allure-pytest`, `requests`, `PyYAML`, `jsonschema`, `SQLAlchemy`, `psycopg2-binary`
 
-## Конфигурация
+### Configuration
 
-Файл `config.yaml` задаёт:
+Edit **config.yaml**:
 
 ```yaml
 api:
@@ -63,76 +70,156 @@ db:
   url: postgresql://test:test@localhost:5432/petstore
 ```
 
-* Можно переопределить `api.base_url` через опцию `--base-url` pytest.
+You can override `api.base_url` with `--base-url` pytest option.
 
-## Структура проекта
+### Project Structure
 
 ```
 petstore-rest-automation-python/
 ├── .github/                   # CI/CD workflows
 │   └── workflows/ci.yml
-├── .venv/                     # виртуальное окружение
+├── .venv/                     # virtualenv
 ├── src/
-│   ├── client.py             # HTTP-клиент + JSON Schema
-│   ├── db.py                 # SQLAlchemy + фикстуры и схема
-│   └── schemas/              # JSON Schema files
+│   ├── client.py              # HTTP client + JSON Schema
+│   ├── db.py                  # SQLAlchemy + DB access
+│   └── schemas/               # JSON Schema files
 ├── tests/
-│   ├── data.py               # фабрики make_user, make_order
-│   ├── constants.py          # LOGIN_SUCCESS_PREFIX и др.
-│   ├── conftest.py           # фикстуры: wait_for_api, new_pet, init_db_schema
-│   ├── test_pet_crud.py      # CRUD и негативные /pet
-│   ├── test_pet_negative.py  # расширенные негативные /pet
-│   ├── test_user_crud.py     # CRUD & дополнительные /user
-│   ├── test_user_negative.py # негативные /user
-├── config.yaml               # настройки API и БД
-├── requirements.txt          # зависимости
-├── pytest.ini                # настройки pytest & markers
-└── README.md                 # документация проекта
+│   ├── data.py                # make_user, make_order factories
+│   ├── constants.py           # key prefixes (e.g. LOGIN_SUCCESS_PREFIX)
+│   ├── conftest.py            # fixtures: wait_for_api, new_pet, init_db_schema
+│   ├── test_pet_crud.py       # CRUD & negative tests for /pet
+│   ├── test_pet_negative.py   # extended negative /pet scenarios
+│   ├── test_user_crud.py      # CRUD & extra tests for /user
+│   ├── test_user_negative.py  # negative /user scenarios
+│   ├── test_store_order.py    # CRUD & negative for /store/order
+│   └── test_store_negative.py # negative /store/order scenarios
+├── config.yaml                # API & DB settings
+├── requirements.txt           # dependencies
+├── pytest.ini                 # pytest settings & markers
+└── README.md                  # this file
 ```
 
-## Запуск тестов
+### Running Tests
 
-1. Поднимите сервисы:
+1. Start services:
 
    ```bash
    docker run -d --name petstore -p 8080:8080 swaggerapi/petstore3:unstable
-   docker run -d --name petstore-db \
-     -e POSTGRES_USER=test -e POSTGRES_PASSWORD=test \
-     -e POSTGRES_DB=petstore -p 5432:5432 postgres:15
+   docker run -d --name petstore-db      -e POSTGRES_USER=test -e POSTGRES_PASSWORD=test      -e POSTGRES_DB=petstore -p 5432:5432 postgres:15
    ```
-2. Запустите тесты и сохраните результаты Allure:
+
+2. Run tests & collect Allure results:
 
    ```bash
-   pytest --maxfail=1 -q \
-          --cov=src --cov-report=xml \
-          --alluredir=allure-results
+   pytest --maxfail=1 -q           --cov=src --cov-report=xml           --alluredir=allure-results
    ```
 
-## CI / GitHub Actions
+### CI / GitHub Actions
 
-В `.github/workflows/ci.yml`:
+Workflow at `.github/workflows/ci.yml`:
 
-* Запуск на любые ветки (`push: branches: ['**']`).
-* Сервисы: Postgres и Swagger Petstore.
-* Установка зависимостей + `allure-pytest`.
-* Запуск `pytest` с `--alluredir`.
-* Загрузка артефактов: Codecov и Allure (через `actions/upload-artifact@v4`).
+- Triggers on **all branches** (`push: branches: ['**']`) and PRs to **main**.  
+- Spins up Postgres and Petstore containers.  
+- Installs dependencies including `allure-pytest`.  
+- Runs `pytest` with coverage & Allure result directory.  
+- Uploads Codecov report and Allure artifacts via `actions/upload-artifact@v4`.
 
-## Отчётность
+### Reporting
 
-* **Coverage**: `coverage.xml` → Codecov.
-* **Allure**: результат в `allure-results/`, частый HTML-отчёт:
+- **Coverage**: `coverage.xml` → Codecov  
+- **Allure**: HTML report from `allure-results/`:
 
   ```bash
   allure serve allure-results
   ```
 
-## Расширение и поддержка
+### Extension & Maintenance
 
-* Добавить unit-тесты и мокирование (для `client` и `db`).
-* Поддержать окружения (staging, prod) через env-variables.
-* Развертывание докера (docker-compose) для локальной инсталляции всех сервисов.
+- Add unit tests & mocks for `client` and `db`.  
+- Support multiple environments (staging, prod) via environment variables.  
+- Integrate Slack/Teams notifications on pipeline status.  
+- Provide a `docker-compose.yml` for full local setup of API + DB.
 
 ---
+
+**Author: Роман Рябинкин**
+
+---
+
+## 🇷🇺 Русский
+
+Фреймворк для автоматизационного тестирования Swagger Petstore REST API на Python с использованием:
+
+* `pytest` + `allure-pytest`  
+* `requests`  
+* `SQLAlchemy`  
+* `jsonschema`
+
+### Содержание
+
+* [Описание проекта](#описание-проекта)  
+* [Требования](#требования)  
+* [Установка](#установка)  
+* [Конфигурация](#конфигурация)  
+* [Структура проекта](#структура-проекта)  
+* [Запуск тестов](#запуск-тестов)  
+* [CI / GitHub Actions](#ci--github-actions)  
+* [Отчётность](#отчётность)  
+* [Расширение и поддержка](#расширение-и-поддержка)  
+
+### Описание проекта
+
+Проект демонстрирует построение расширяемого REST-фреймворка с:
+
+* **HTTP-клиентом** (`src/client.py`): методы `get`, `post`, `put`, `delete`, валидация JSON-ответов по схемам (`src/schemas/*.json`).  
+* **Доступом к БД** (`src/db.py`): SQLAlchemy, фикстуры для инициализации схемы и синхронизации данных.  
+* **Фабриками тестовых данных** (`tests/data.py`): `make_user()`, `make_order()`.  
+* **Константами** (`tests/constants.py`): ключевые префиксы ответов (например, `LOGIN_SUCCESS_PREFIX`).  
+* **Тестами** (`tests/`): позитивные и негативные сценарии для `/pet`, `/user`, `/store/order`.  
+* **Allure** для генерации удобного HTML-отчёта.
+
+### Требования
+
+* Python 3.8+  
+* Docker (Petstore API и Postgres)  
+* Git  
+
+### Установка
+
+```bash
+git clone https://github.com/RomanRyabinkin/petstore-rest-automation-python.git
+cd petstore-rest-automation-python
+python -m venv .venv
+source .venv/bin/activate      # Linux/macOS
+.\.venv\Scripts\Activate.ps1   # Windows PowerShell
+pip install -r requirements.txt
+```
+
+### Конфигурация
+
+```yaml
+api:
+  base_url: http://localhost:8080/api/v3
+  timeout: 5
+
+db:
+  url: postgresql://test:test@localhost:5432/petstore
+```
+
+### Подготовка и запуск тестов
+
+```bash
+docker run -d --name petstore -p 8080:8080 swaggerapi/petstore3:unstable
+docker run -d --name petstore-db   -e POSTGRES_USER=test -e POSTGRES_PASSWORD=test   -e POSTGRES_DB=petstore -p 5432:5432 postgres:15
+
+pytest --maxfail=1 -q --cov=src --cov-report=xml --alluredir=allure-results
+```
+
+### CI и отчёты
+
+CI настроен в `.github/workflows/ci.yml`, использует GitHub Actions для запуска тестов, загрузки отчётов в Codecov и Allure.
+
+**Автор: Роман Рябинкин**
+
 
 *Автор: Роман Рябинкин*
